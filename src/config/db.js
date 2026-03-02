@@ -1,17 +1,32 @@
+import "dotenv/config";
 import pkg from "pg";
 
 const { Pool } = pkg;
 
+const requiredEnv = [
+  "PG_USER",
+  "PG_PASSWORD",
+  "PG_HOST",
+  "PG_DATABASE",
+  "PG_PORT",
+  "PG_SCHEMA"
+];
+
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    throw new Error(`Falta la variable de entorno obligatoria: ${key}`);
+  }
+}
+
 export const pool = new Pool({
-  user: "riwi_cohorte_6",
-  password: "Riwi2026+",
-  host: "51.222.142.204",
-  database: "richie_ft_tesla",
-  options: '-c search_path="m4s2_ypr"',
-  port: 5432
+  user: process.env.PG_USER,
+  password: process.env.PG_PASSWORD,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  port: Number(process.env.PG_PORT),
+  options: `-c search_path="${process.env.PG_SCHEMA}"`
 });
 
-
-pool.connect()
-  .then(() => console.log("✅ Conectado a PostgreSQL"))
-  .catch((err) => console.error("❌ Error de conexión:", err.message));
+export const testDbConnection = async () => {
+  await pool.query("SELECT 1");
+};

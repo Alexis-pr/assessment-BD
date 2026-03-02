@@ -1,17 +1,28 @@
-  import express from "express";
+import express from "express";
+import { testDbConnection } from "./config/db.js";
+import importRoutes from "./routes/import.routes.js";
 
+const app = express();
+const port = Number(process.env.PORT || process.env.Port || 3000);
 
+// middlewares
+app.use(express.json());
 
-  import importRoutes from "./routes/import.routes.js";
+// routes
+app.use("/api/import-excel", importRoutes);
 
-  const app = express();
+// server
+const start = async () => {
+  try {
+    await testDbConnection();
+    console.log("✅ Conectado a PostgreSQL");
+  } catch (err) {
+    console.error("❌ Error de conexión a PostgreSQL:", err.message);
+  }
 
-  app.use(express.json());
+  app.listen(port, () => {
+    console.log(`🚀 Servidor corriendo en puerto ${port}`);
+  });
+};
 
-  // 👇 registras cada módulo manualmente
-
-  app.use("/api/import-excel", importRoutes);
-
-  app.listen(3000, () =>
-    console.log("Servidor corriendo en puerto 3000 🚀")
-  );
+start();
