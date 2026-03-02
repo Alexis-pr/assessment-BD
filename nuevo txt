@@ -1,0 +1,92 @@
+-- ==========================
+-- TABLA DE CLIENTES
+-- ==========================
+CREATE TABLE customers (
+    id_customer SERIAL PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    customer_email VARCHAR(100) UNIQUE NOT NULL,
+    customer_address VARCHAR(150) NOT NULL,
+    customer_phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT now()
+);
+
+-- ==========================
+-- TABLA DE PROVEEDORES
+-- ==========================
+CREATE TABLE suppliers (
+    id_supplier SERIAL PRIMARY KEY,
+    supplier_name VARCHAR(100) NOT NULL,
+    supplier_email VARCHAR(100) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT now()
+);
+
+-- ==========================
+-- TABLA DE PRODUCTOS
+-- ==========================
+CREATE TABLE products (
+    product_sku SERIAL PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    product_description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    stock INT DEFAULT 0,
+    id_supplier INT,
+    created_at TIMESTAMP DEFAULT now(),
+    CONSTRAINT fk_product_supplier
+        FOREIGN KEY (id_supplier)
+        REFERENCES suppliers(id_supplier)
+        ON DELETE SET NULL
+);
+
+-- ==========================
+-- TABLA DE PEDIDOS
+-- ==========================
+CREATE TABLE orders (
+    id_order SERIAL PRIMARY KEY,
+    id_customer INT NOT NULL,
+    order_date TIMESTAMP DEFAULT now(),
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT now(),
+    CONSTRAINT fk_orders_customer
+        FOREIGN KEY(id_customer)
+        REFERENCES customers(id_customer)
+        ON DELETE CASCADE
+);
+
+-- ==========================
+-- DETALLE DE PEDIDOS (RELACIONA ORDERS Y PRODUCTS)
+-- ==========================
+CREATE TABLE order_items (
+    id_order_item SERIAL PRIMARY KEY,
+    id_order INT NOT NULL,
+    product_sku INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    price DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_order_items_order
+        FOREIGN KEY (id_order)
+        REFERENCES orders(id_order)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_order_items_product
+        FOREIGN KEY (product_sku)
+        REFERENCES products(product_sku)
+        ON DELETE CASCADE
+);
+
+-- ==========================
+-- TABLA DE TRANSACCIONES
+-- ==========================
+CREATE TABLE transactions (
+    id_transaction SERIAL PRIMARY KEY,
+    transaction_code VARCHAR(30) NOT NULL,
+    id_order INT NOT NULL,
+    id_supplier INT,
+    amount DECIMAL(12,2) NOT NULL,
+    transaction_date TIMESTAMP DEFAULT now(),
+    CONSTRAINT fk_transaction_order
+        FOREIGN KEY (id_order)
+        REFERENCES orders(id_order)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_transaction_supplier
+        FOREIGN KEY (id_supplier)
+        REFERENCES suppliers(id_supplier)
+        ON DELETE SET NULL
+);
