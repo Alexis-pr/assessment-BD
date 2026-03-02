@@ -1,0 +1,62 @@
+create table customers(
+	id_customer serial primary key ,
+	customer_name varchar(100) NOT NULL,
+	customer_email varchar(100) unique not null,
+	customer_addres varchar(150) NOT NULL,
+	customer_phone varchar(20),
+	create_at timestamp  default now()
+	
+)
+
+
+create table orders(
+	id_order serial primary key ,
+	id_customer int,
+	date varchar(20),
+	created_at timestamp default now()	
+)
+
+alter table orders 
+add constraint  fk_orders_customer
+FOREIGN KEY(id_customer)
+references customers(id_customer)
+ON DELETE cascade
+		
+alter table orders 
+add constraint fk_orders_transaction
+foreign key (id_order)
+references transactions(id_order)
+on delete cascade
+
+
+create table transactions(
+	id_transaction serial primary key,
+	trasaction_code varchar(30),
+	id_order int,
+	id_supplier int,
+	create_at timestamp  default now(),
+	
+	CONSTRAINT fk_transaction_supplier
+		FOREIGN KEY (id_supplier)
+		REFERENCES suppliers(id_supplier)
+		ON DELETE cascade
+		
+	
+)
+
+
+
+create table suppliers(
+	id_supplier serial primary key,
+	supplier_name varchar(100) not null,
+	supplier_email varchar(100) unique not null,
+	create_at timestamp  default now()
+	
+)
+
+
+
+create table products(
+	product_sku serial primary key,
+	
+)
