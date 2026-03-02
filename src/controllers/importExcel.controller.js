@@ -2,8 +2,7 @@ import xlsx from "xlsx";
 import path from "path";
 
 import {
-  insertStudent,
-  getStudentByEmail
+  insertCustomer
 } from "../models/importExcel.model.js";
 
 export const importExcel = async (req, res) => {
@@ -18,12 +17,12 @@ export const importExcel = async (req, res) => {
     let total = 0;
 
     for (const r of rows) {
-      const name  = r.estudiante;
-      const email = r.email;
-      const phone = r.telefono;
-
-      await insertStudent(name, phone, email);
-      await getStudentByEmail(email);
+      await insertCustomer({
+        name: r.customer_name,
+        email: r.customer_email,
+        phone: String(r.customer_phone ?? ""),
+        address: r.customer_address
+      });
 
       total++;
       console.log(`✅ ${total}/${rows.length}`);
