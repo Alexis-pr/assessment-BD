@@ -27,6 +27,7 @@ export const pool = new Pool({
   options: `-c search_path="${process.env.PG_SCHEMA}"`
 });
 
+
 export const testDbConnection = async () => {
   await pool.query("SELECT 1");
 };

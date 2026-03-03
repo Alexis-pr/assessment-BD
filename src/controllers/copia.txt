@@ -1,0 +1,102 @@
+import xlsx from "xlsx";
+import path from "path";
+
+import {
+  insertCustomer
+} from "../models/importExcel.model.js";
+
+export const importExcel = async (req, res) => {
+  try {
+    const filePath = path.resolve("src/data/data.xlsx");
+    const workbook = xlsx.readFile(filePath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = xlsx.utils.sheet_to_json(sheet);
+
+    console.log(`Filas encontradas: ${rows.length}`);
+
+    let total = 0
+
+    const customerCache = {};
+
+
+    for (const r of rows) {
+      await insertCustomer({
+        name: r.customer_name,
+        email: r.customer_email,
+        phone: String(r.customer_phone ?? ""),
+        address: r.customer_address
+      });
+
+      total++;
+      console.log(` ${total}/${rows.length}`);
+    }
+
+    res.json({
+      message: "Importación completada correctamente ",
+      total
+    });
+
+  } catch (error) {
+    console.error(" Error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+-----------
+
+
+
+import xlsx from "xlsx";
+import path from "path";
+
+import {
+  insertCustomer
+} from "../models/importExcel.model.js";
+
+export const importExcel = async (req, res) => {
+  try {
+    const filePath = path.resolve("src/data/data.xlsx");
+    const workbook = xlsx.readFile(filePath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = xlsx.utils.sheet_to_json(sheet);
+
+    console.log(` Filas encontradas: ${rows.length}`);
+
+     const customerCache = {};
+
+    let total = 0
+
+   
+
+
+    for (const r of rows) {
+        const name = r.customer_name;
+        const email = r.customer_email;
+        const phone = String(r.customer_phone ?? "");
+        const address = r.customer_address;
+      await insertCustomer({ name, phone, email, address });
+        const customer = await getCustomerByEmail(email);
+         if (!customerCache[email]) {
+           await insertCustomer({ name, phone, email, address });
+              const c = await getCustomerByEmail(email);
+              customerCache[email] = c.rows[0];
+         }
+
+        total++;
+        console.log(` Encontrados: ${total}/${rows.length}`);      
+    }
+
+    res.json({
+      message: "Importación completada correctamente ",
+      total
+    });
+
+  } catch (error) {
+    console.error(" Error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
+

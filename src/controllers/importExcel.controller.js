@@ -2,7 +2,11 @@ import xlsx from "xlsx";
 import path from "path";
 
 import {
-  insertCustomer
+  insertCustomer,
+  findAllSuppliers,
+  findAllOrdersByCustomer,
+  findProductsbySeller,
+
 } from "../models/importExcel.model.js";
 
 export const importExcel = async (req, res) => {
@@ -12,9 +16,12 @@ export const importExcel = async (req, res) => {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = xlsx.utils.sheet_to_json(sheet);
 
-    console.log(`📊 Filas encontradas: ${rows.length}`);
+    console.log(` Filas encontradas: ${rows.length}`);
 
-    let total = 0;
+    let total = 0
+
+    const customerCache = {};
+
 
     for (const r of rows) {
       await insertCustomer({
@@ -24,8 +31,18 @@ export const importExcel = async (req, res) => {
         address: r.customer_address
       });
 
+      await findAllSuppliers();      
+      
+      const customer = await findCustomerByEmail(r.customer_email);
+        if (customer) {
+
+        await findAllOrdersByCustomer(customer.customer_id);
+        }
+        
+        await findProductsbySeller(r.supplier_id);
+        
       total++;
-      console.log(`✅ ${total}/${rows.length}`);
+      console.log(`Encontrados:  ${total}/${rows.length}`);
     }
 
     res.json({
@@ -34,7 +51,7 @@ export const importExcel = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    console.error("El Error es:", error.message);
     res.status(500).json({ error: error.message });
   }
 };
