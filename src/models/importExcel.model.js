@@ -8,11 +8,39 @@ export const insertCustomer = ({ name, phone, email, address }) =>
     [name, phone, email, address]
   );
 
+  export const insertSuplier = ({name,email}) =>
+    pool.query(`
+        insert into supplier(supplier_name, supplier_email, created_at)
+        values ($1,$2,now())
+        on conflict (supplier_email) do nothing`,
+        [name,email]
+    )
+  
+  export const insertCategories = ({product}) => 
+    pool.query(`
+      insert into categories(product_category,created_at)
+      values($1,now())
+      on conflict (product_category) do nothing`,
+      [product]
+    )
+  
+
+  expo
+
+
+
+
+
+
+
+
+
+
 
 
   export const findCustomerByEmail = (email) =>
   pool.query(
-    `SELECT * FROM customers WHERE customer_email = $1`,
+    `SELECT * FROM customers WHERE customer_email =   $1`,
     [email]
   ).then(res => res.rows[0]);
 
