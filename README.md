@@ -35,5 +35,7 @@ This one is chosen as nosql because it has the most continuous changes
 
 ## Errors
 {"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+se soluciona con 
+ADD CONSTRAINT supplier_email_unique UNIQUE (supplier_email);
 
 
